@@ -1,0 +1,14 @@
+{
+  "title": "The Hedge",
+  "music": "bed",
+  "sources": [],
+  "lines": [
+    { "text": "Gary!", "caps": "*GARY!" },
+    { "text": "Your hedge is taller than mine again!", "caps": "YOUR *HEDGE | IS *TALLER | THAN MINE *AGAIN!" },
+    { "text": "Some of us have patience, Dave.", "caps": "SOME OF US | HAVE *PATIENCE, | *DAVE." },
+    { "text": "Patience is for losers.", "caps": "*PATIENCE | IS FOR *LOSERS." },
+    { "text": "Dave.", "caps": "*DAVE." },
+    { "text": "Why is it dark at nine a.m.?", "caps": "WHY IS IT *DARK | AT *NINE A.M.?" },
+    { "text": "Thanks for the shade, neighbour!", "caps": "THANKS FOR | THE *SHADE, | *NEIGHBOUR!" }
+  ]
+}
