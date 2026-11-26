@@ -1,0 +1,26 @@
+{
+ "title": "She's Here",
+ "music": "bed",
+ "lines": [
+  {
+   "text": "Hello, Dave. I brought lasagna.",
+   "caps": "HELLO, *DAVE. | I BROUGHT *LASAGNA."
+  },
+  {
+   "text": "Linda says you love it.",
+   "caps": "LINDA SAYS | YOU *LOVE IT."
+  },
+  {
+   "text": "I LOVE it!",
+   "caps": "I *LOVE IT!"
+  },
+  {
+   "text": "So... how long are you staying?",
+   "caps": "SO... HOW LONG | ARE YOU *STAYING?"
+  },
+  {
+   "text": "Until you finish them.",
+   "caps": "UNTIL YOU | *FINISH THEM."
+  }
+ ]
+}

@@ -1,0 +1,103 @@
+{
+ "duration": 19.1,
+ "cues": [
+  {
+   "t": 0.1,
+   "type": "doorbell"
+  },
+  {
+   "t": 0.4,
+   "type": "slide",
+   "dur": 0.4,
+   "gain": 0.5
+  },
+  {
+   "t": 3.83,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 5.61,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 7.23,
+   "type": "whoosh",
+   "gain": 0.5
+  },
+  {
+   "t": 7.35,
+   "type": "bark",
+   "dur": 1.08
+  },
+  {
+   "t": 8.58,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 11.33,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 13.53,
+   "type": "whoosh"
+  },
+  {
+   "t": 13.7,
+   "type": "pop",
+   "gain": 0.8
+  },
+  {
+   "t": 13.95,
+   "type": "pop",
+   "gain": 0.9500000000000001
+  },
+  {
+   "t": 14.2,
+   "type": "pop",
+   "gain": 1.1
+  },
+  {
+   "t": 14.88,
+   "type": "whoosh"
+  },
+  {
+   "t": 15.62,
+   "type": "thud",
+   "gain": 0.7
+  },
+  {
+   "t": 16.3,
+   "type": "sting"
+  },
+  {
+   "t": 16.35,
+   "type": "pop",
+   "gain": 0.4
+  },
+  {
+   "t": 16.42,
+   "type": "pop",
+   "gain": 0.4
+  },
+  {
+   "t": 16.49,
+   "type": "pop",
+   "gain": 0.4
+  },
+  {
+   "t": 16.56,
+   "type": "pop",
+   "gain": 0.4
+  },
+  {
+   "t": 16.75,
+   "type": "bark",
+   "dur": 0.36,
+   "gain": 0.7
+  }
+ ]
+}
