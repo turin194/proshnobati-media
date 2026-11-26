@@ -101,9 +101,17 @@ def yap(**_):
         out += [(np.sin(ph) + 0.5 * np.sin(2 * ph)) * env(len(t), 0.004, 5), np.zeros(int(0.05 * SR))]
     return lp(np.concatenate(out), 3500) * 0.7
 
-FX = dict(yap=yap, inhale=inhale, heartbeat=heartbeat, whoosh=whoosh, slide=slide, pop=pop, plop=plop, gulp=gulp, boing=boing, bubbles=bubbles, sizzle=sizzle,
+def bark(d=None, **_):
+    """Pickles' bark: the fixed recording in sounds/pickles_bark.mp3 (kit-wide: ../sounds/ also works). dur trims it."""
+    for f in (P / 'sounds/pickles_bark.mp3', P / '../sounds/pickles_bark.mp3'):
+        if f.exists():
+            x = load_audio(f).mean(1)
+            return x[:int(d * SR)] if d else x
+    raise SystemExit('missing sounds/pickles_bark.mp3 (the fixed Pickles bark)')
+
+FX = dict(bark=bark, yap=yap, inhale=inhale, heartbeat=heartbeat, whoosh=whoosh, slide=slide, pop=pop, plop=plop, gulp=gulp, boing=boing, bubbles=bubbles, sizzle=sizzle,
           sparkle=sparkle, thud=thud, slam=slam, tock=tock, zip=zip_, alarm=alarm)
-LEVEL = dict(yap=-12, inhale=-15, heartbeat=-8, whoosh=-17, slide=-19, pop=-14, plop=-15, gulp=-11, boing=-15, bubbles=-21, sizzle=-18, sparkle=-17,
+LEVEL = dict(bark=-7, yap=-12, inhale=-15, heartbeat=-8, whoosh=-17, slide=-19, pop=-14, plop=-15, gulp=-11, boing=-15, bubbles=-21, sizzle=-18, sparkle=-17,
              thud=-11, slam=-9, tock=-18, zip=-14, alarm=-17)
 
 
@@ -170,7 +178,7 @@ for c in cj['cues']:
     fn = FX.get(c['type'])
     if not fn: print('unknown cue type, skipped:', c['type']); continue
     x = fn(**({'d': c['dur']} if c.get('dur') else {}))
-    x = lp(x, 5000) * db(LEVEL[c['type']]) * c.get('gain', 1.0) / (np.abs(x).max() + 1e-9) * 0.9
+    x = (x if c['type'] == 'bark' else lp(x, 5000)) * db(LEVEL[c['type']]) * c.get('gain', 1.0) / (np.abs(x).max() + 1e-9) * 0.9
     i = int(c['t'] * SR); n = min(len(x), N - i)
     if n > 0 and i >= 0: pan = c.get('pan', 0.0); mix[i:i + n, 0] += x[:n] * (1 - max(0, pan)); mix[i:i + n, 1] += x[:n] * (1 + min(0, pan))
 # master: gentle soft-clip, peak -1 dBFS

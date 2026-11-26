@@ -107,7 +107,7 @@ export function buildShots() {
     pickles(lerp(1250, 900, pin), 1990, 1.25, { dir: -1, bark: (Math.sin(lt * 18) > 0 ? 1 : 0.2), t });
     yap(720, 1180, seg(lt, 0.3, 0.42), -0.15); yap(870, 960, seg(lt, 0.75, 0.87), 0.12);
   } });
-  cue(cut.react - 0.02, 'whoosh'); cue(cut.react + 0.32, 'yap'); cue(cut.react + 0.77, 'yap');
+  cue(cut.react - 0.02, 'whoosh'); cue(cut.react + 0.22, 'bark', { dur: 1.12 });
 
   // 7. End card
   add({ id: 'H', at: cut.end, cam: [540, 960], zoom: 0, note: 'Follow Plotbulb', draw(lt) { endCard(lt); } });
