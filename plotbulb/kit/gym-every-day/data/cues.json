@@ -1,0 +1,74 @@
+{
+ "duration": 17.4,
+ "cues": [
+  {
+   "t": 2.35,
+   "type": "tock",
+   "gain": 0.4
+  },
+  {
+   "t": 3.48,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 3.6,
+   "type": "bark",
+   "dur": 1.08
+  },
+  {
+   "t": 4.83,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 5.93,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 6.05,
+   "type": "bark",
+   "dur": 1.62,
+   "gain": 1.15
+  },
+  {
+   "t": 7.78,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 9.3,
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "t": 9.93,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 14.25,
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "t": 14.58,
+   "type": "whoosh"
+  },
+  {
+   "t": 15,
+   "type": "bark",
+   "dur": 0.36
+  },
+  {
+   "t": 16.05,
+   "type": "pop"
+  },
+  {
+   "t": 16.2,
+   "type": "sparkle",
+   "gain": 0.6
+  }
+ ]
+}

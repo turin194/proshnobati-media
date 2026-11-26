@@ -1,0 +1,27 @@
+{
+ "title": "Gym Every Day",
+ "music": "bed",
+ "sources": [],
+ "lines": [
+  {
+   "text": "Linda, I've been to the gym every single day this month!",
+   "caps": "LINDA, I'VE BEEN | TO THE *GYM | EVERY SINGLE *DAY | THIS *MONTH!"
+  },
+  {
+   "text": "...Most days.",
+   "caps": "...*MOST DAYS."
+  },
+  {
+   "text": "...I drove past it.",
+   "caps": "...I *DROVE | *PAST IT."
+  },
+  {
+   "text": "Funny. The gym called today.",
+   "caps": "*FUNNY. | THE GYM *CALLED | *TODAY."
+  },
+  {
+   "text": "They asked if you're still alive.",
+   "caps": "THEY *ASKED IF YOU'RE | STILL *ALIVE."
+  }
+ ]
+}

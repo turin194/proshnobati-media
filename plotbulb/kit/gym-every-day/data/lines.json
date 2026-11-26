@@ -1,0 +1,37 @@
+{
+ "duration": 17.4,
+ "voice": "elevenlabs",
+ "speed": 1,
+ "lines": [
+  {
+   "i": 0,
+   "text": "Linda, I've been to the gym every single day this month!",
+   "start": 0.35,
+   "end": 3.45
+  },
+  {
+   "i": 1,
+   "text": "...Most days.",
+   "start": 5.05,
+   "end": 5.85
+  },
+  {
+   "i": 2,
+   "text": "...I drove past it.",
+   "start": 8.0,
+   "end": 9.2
+  },
+  {
+   "i": 3,
+   "text": "Funny. The gym called today.",
+   "start": 10.2,
+   "end": 12.45
+  },
+  {
+   "i": 4,
+   "text": "They asked if you're still alive.",
+   "start": 12.95,
+   "end": 14.4
+  }
+ ]
+}
