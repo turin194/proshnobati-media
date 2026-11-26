@@ -109,9 +109,26 @@ def bark(d=None, **_):
             return x[:int(d * SR)] if d else x
     raise SystemExit('missing sounds/pickles_bark.mp3 (the fixed Pickles bark)')
 
-FX = dict(bark=bark, yap=yap, inhale=inhale, heartbeat=heartbeat, whoosh=whoosh, slide=slide, pop=pop, plop=plop, gulp=gulp, boing=boing, bubbles=bubbles, sizzle=sizzle,
+def sting(**_):
+    """The Pettys sting: an original 1.9 s brass fanfare. Pickup G4-A4-B4 (bouncy), then a C major hit with a cymbal swell."""
+    d = 1.9; x = np.zeros(int(d * SR))
+    def brass(f, dur, amp, vib=0.0):
+        t = tt(dur); ph = 2 * np.pi * np.cumsum(f * (1 + vib * np.sin(2 * np.pi * 5.5 * t))) / SR
+        w = sum(np.sin(k * ph) / k for k in range(1, 9))                       # bright saw-like stack
+        e = np.minimum(1, t / 0.015) * np.exp(-t * (1.2 if dur > 0.5 else 7))
+        return lp(w * e, 3200) * amp
+    for i, f in enumerate([392.0, 440.0, 493.9]):                            # ta - da - da
+        n = brass(f, 0.11, 0.55); st = int(i * 0.13 * SR); x[st:st + len(n)] += n
+    hit = int(0.42 * SR)
+    for f, a in [(261.6, 0.5), (329.6, 0.45), (392.0, 0.45), (523.3, 0.55), (130.8, 0.4)]:   # DAAA
+        n = brass(f, 1.4, a, 0.006); x[hit:hit + len(n)] += n
+    cy = hp(noise(1.2), 3000) * np.exp(-np.linspace(0, 4, int(1.2 * SR))) * 0.25; x[hit:hit + len(cy)] += cy
+    kick = np.sin(2 * np.pi * (60 + 80 * np.exp(-tt(0.25) * 30)) * tt(0.25)) * np.exp(-tt(0.25) * 12); x[hit:hit + len(kick)] += kick * 0.8
+    return x
+
+FX = dict(sting=sting, bark=bark, yap=yap, inhale=inhale, heartbeat=heartbeat, whoosh=whoosh, slide=slide, pop=pop, plop=plop, gulp=gulp, boing=boing, bubbles=bubbles, sizzle=sizzle,
           sparkle=sparkle, thud=thud, slam=slam, tock=tock, zip=zip_, alarm=alarm)
-LEVEL = dict(bark=-7, yap=-12, inhale=-15, heartbeat=-8, whoosh=-17, slide=-19, pop=-14, plop=-15, gulp=-11, boing=-15, bubbles=-21, sizzle=-18, sparkle=-17,
+LEVEL = dict(sting=-6, bark=-7, yap=-12, inhale=-15, heartbeat=-8, whoosh=-17, slide=-19, pop=-14, plop=-15, gulp=-11, boing=-15, bubbles=-21, sizzle=-18, sparkle=-17,
              thud=-11, slam=-9, tock=-18, zip=-14, alarm=-17)
 
 
@@ -178,7 +195,7 @@ for c in cj['cues']:
     fn = FX.get(c['type'])
     if not fn: print('unknown cue type, skipped:', c['type']); continue
     x = fn(**({'d': c['dur']} if c.get('dur') else {}))
-    x = (x if c['type'] == 'bark' else lp(x, 5000)) * db(LEVEL[c['type']]) * c.get('gain', 1.0) / (np.abs(x).max() + 1e-9) * 0.9
+    x = (x if c['type'] in ('bark', 'sting') else lp(x, 5000)) * db(LEVEL[c['type']]) * c.get('gain', 1.0) / (np.abs(x).max() + 1e-9) * 0.9
     i = int(c['t'] * SR); n = min(len(x), N - i)
     if n > 0 and i >= 0: pan = c.get('pan', 0.0); mix[i:i + n, 0] += x[:n] * (1 - max(0, pan)); mix[i:i + n, 1] += x[:n] * (1 + min(0, pan))
 # master: gentle soft-clip, peak -1 dBFS

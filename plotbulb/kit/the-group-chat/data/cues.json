@@ -1,5 +1,5 @@
 {
- "duration": 21.5,
+ "duration": 22.8,
  "cues": [
   {
    "t": 0.5,
@@ -123,13 +123,29 @@
    "type": "whoosh"
   },
   {
-   "t": 20.05,
-   "type": "pop"
+   "t": 20,
+   "type": "sting"
   },
   {
-   "t": 20.2,
-   "type": "sparkle",
-   "gain": 0.6
+   "t": 20.05,
+   "type": "pop",
+   "gain": 0.4
+  },
+  {
+   "t": 20.12,
+   "type": "pop",
+   "gain": 0.4
+  },
+  {
+   "t": 20.19,
+   "type": "pop",
+   "gain": 0.4
+  },
+  {
+   "t": 20.45,
+   "type": "bark",
+   "dur": 0.36,
+   "gain": 0.7
   }
  ]
 }

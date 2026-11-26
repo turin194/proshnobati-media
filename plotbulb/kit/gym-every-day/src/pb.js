@@ -523,3 +523,51 @@ export function endCard(lt) {
   const k3 = eob(clamp((lt - 0.35) / 0.35));
   ctx.save(); ctx.translate(540, 1500); ctx.scale(k3, k3); box(-200, -50, 400, 100, 50, P.red, INK, 8); label('SUBSCRIBE', 0, 2, 50, '#FFFFFF'); ctx.restore();
 }
+
+// ---------- The Pettys end card (series brand) ----------
+// lt = time since the card starts. The sting's hit lands at lt = 0.42 (logo slam). Needs person/pickles above.
+export function pettysCard(lt, t) {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#3E7FD6'); g.addColorStop(1, '#2A5BA8');
+  ctx.fillStyle = g; ctx.fillRect(-300, -300, W + 600, H + 600);
+  ctx.save(); ctx.translate(540, 760); ctx.rotate(lt * 0.2);
+  for (let i = 0; i < 18; i++) { ctx.rotate(TAU / 18); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-80, -1700); ctx.lineTo(80, -1700); ctx.closePath(); ctx.fillStyle = i % 2 ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0)'; ctx.fill(); }
+  ctx.restore();
+  // the house behind the family
+  const hk = eob(clamp(lt / 0.3));
+  ctx.save(); ctx.translate(540, 1300); ctx.scale(hk, hk); ctx.translate(-540, -1300);
+  house(250, 1300, 580, {});
+  ctx.restore();
+  // family pops in, one by one (squash on landing)
+  const pop = (a) => { const k = clamp((lt - a) / 0.22); return k <= 0 ? null : { k: eob(k), q: k < 1 ? 0.35 * (1 - k) : 0 }; };
+  const G = pop(0.05), D = pop(0.12), Lp = pop(0.19), Pk = pop(0.3);
+  ctx.save(); ctx.beginPath(); ctx.rect(-300, -300, W + 600, 1845); ctx.clip();
+  if (G) person(lerp(1300, 900, G.k), 1545, CAST.gary, { s: 0.7, t, mood: 'smug', gesture: 'cross', look: [-0.6, 0], squash: G.q });
+  if (D) person(300, lerp(2300, 1545, D.k), CAST.dave, { s: 0.8, t, mood: 'happy', gesture: 'shrug', squash: D.q, talk: 0 });
+  if (Lp) person(620, lerp(2300, 1545, Lp.k), CAST.linda, { s: 0.8, t, mood: 'smug', gesture: 'hips', squash: Lp.q, look: [-0.4, 0] });
+  ctx.restore();
+  // ground band + Pickles
+  ctx.fillStyle = '#6CC04A'; ctx.fillRect(-300, 1540, W + 600, 60); stroke([[-300, 1540], [W + 300, 1540]], INK, 8);
+  if (Pk) pickles(lerp(-200, 170, Pk.k), 1590, 0.9, { dir: 1, t, bark: lt > 0.42 && lt < 0.7 ? 1 : 0 });
+  // logo slams in on the hit
+  const lk = clamp((lt - 0.38) / 0.16);
+  if (lk > 0) {
+    const sc = lerp(2.2, 1, eo(lk)) * (1 + 0.06 * Math.sin(Math.max(0, lt - 0.54) * 18) * Math.exp(-Math.max(0, lt - 0.54) * 5));
+    ctx.save(); ctx.translate(540, 300); ctx.rotate(-0.05); ctx.scale(sc, sc);
+    box(-430, -150, 860, 300, 46, P.red, INK, 12);
+    label('THE', 0, -78, 70, '#FFFFFF', 18);
+    label('PETTYS', 0, 40, 190, P.yellow, 34);
+    ctx.restore();
+  }
+  // Plotbulb + subscribe
+  const bk = eob(clamp((lt - 0.7) / 0.3));
+  if (bk > 0) {
+    ctx.save(); ctx.translate(540, 1740); ctx.scale(bk, bk);
+    label('NEW EPISODE EVERY DAY', 0, -60, 56, '#FFFFFF', 16);
+    // tiny bulb
+    disc(-250, 50, 38, '#FFFFFF', INK, 6); box(-268, 86, 36, 22, 6, '#C9CED6', INK, 5);
+    label('PLOTBULB', -60, 52, 60, P.yellow, 16);
+    box(150, 8, 270, 88, 44, P.red, INK, 7); label('SUBSCRIBE', 285, 54, 40, '#FFFFFF');
+    ctx.restore();
+  }
+}

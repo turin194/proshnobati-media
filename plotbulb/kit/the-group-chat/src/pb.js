@@ -82,12 +82,6 @@ export function head(x, y, r, o = {}) {
     ctx.fillStyle = '#8E5A2E'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.stroke();
   }
   disc(x, y, r, '#FFFFFF', INK, lw);
-  if (o.band) {   // sweatband
-    ctx.save(); ctx.beginPath(); ctx.arc(x, y, r - lw / 2, 0, TAU); ctx.clip();
-    ctx.fillStyle = o.band; ctx.fillRect(x - r, y - r * 0.78, r * 2, r * 0.24);
-    stroke([[x - r, y - r * 0.78], [x + r, y - r * 0.78]], INK, lw * 0.5); stroke([[x - r, y - r * 0.54], [x + r, y - r * 0.54]], INK, lw * 0.5);
-    ctx.restore(); disc(x, y, r, null, INK, lw);
-  }
   if (c.head === 'bob') {   // fringe over the forehead
     ctx.beginPath();
     ctx.moveTo(x - r * 1.02, y + r * 0.1);
@@ -235,14 +229,14 @@ export function person(x, y, c, o = {}) {
   arm(-1, A.L ?? 0.08, A.bL ?? 0, o.holdL);
   arm(1, A.R ?? 0.08, A.bR ?? 0, o.hold);
   // head
-  head(x + (o.headDX || 0) * s, topY - r + 30 * s, r, { band: o.band, cast: c, mood: o.mood, talk: o.talk, look: o.look, blink: o.blink, sweat: o.sweat, shades: o.shades, t: o.t });
+  head(x + (o.headDX || 0) * s, topY - r + 30 * s, r, { cast: c, mood: o.mood, talk: o.talk, look: o.look, blink: o.blink, sweat: o.sweat, shades: o.shades, t: o.t });
   if (o.glow) { /* night readability: soft rim */ }
   ctx.restore();
 }
 
 // ---------- Pickles the chihuahua ----------
 export function pickles(x, y, s = 1, o = {}) {
-  const d = o.dir || 1, bark = o.bark || 0, lw = 7, fur = '#E2B97E';
+  const d = o.dir || 1, bark = o.bark || 0, lw = 7 * s, fur = '#E2B97E';
   ctx.save(); ctx.translate(x, y); ctx.scale(d * s, s);
   for (const lx of [-60, -35, 40, 62]) stroke([[lx, -70], [lx, -8]], INK, 9);
   ctx.beginPath(); ctx.moveTo(-85, -95); ctx.quadraticCurveTo(-130, -150 - 20 * Math.sin((o.t || 0) * 20), -110, -170); ctx.strokeStyle = INK; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();

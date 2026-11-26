@@ -1,7 +1,7 @@
 // GYM EVERY DAY: Dave brags; Pickles barks at every lie; Linda delivers the gym's phone call.
 import { ctx, W, H, clamp, lerp, seg, eo, eio, eob } from './core/lib.js';
 import { L, Le, Wd, T } from './core/timing.js';
-import { CAST, P, INK, person, pickles, yap, street, GROUND, endCard, blurred, stroke, disc, label, box, poly } from './pb.js';
+import { CAST, P, INK, person, pickles, yap, street, GROUND, endCard, pettysCard, blurred, stroke, disc, label, box, poly } from './pb.js';
 
 const ENV = await (await fetch('data/env.json', { cache: 'no-store' })).json();
 const SPEAK = { dave: [0, 1, 2], linda: [3, 4] };
@@ -108,7 +108,7 @@ export function buildShots() {
   } });
   cue(C.h - 0.02, 'whoosh'); cue(bark3, 'bark', { dur: 0.36 });
 
-  add({ id: 'H', at: C.end, cam: [540, 960], zoom: 0, note: 'Follow Plotbulb', draw(lt) { endCard(lt); } });
-  cue(C.end + 0.05, 'pop'); cue(C.end + 0.2, 'sparkle', { gain: 0.6 });
+  add({ id: 'H', at: C.end, cam: [540, 960], zoom: 0, note: 'The Pettys card', draw(lt, d, t) { pettysCard(lt, t); } });
+  cue(C.end, 'sting'); cue(C.end + 0.05, 'pop', { gain: 0.4 }); cue(C.end + 0.12, 'pop', { gain: 0.4 }); cue(C.end + 0.19, 'pop', { gain: 0.4 }); cue(C.end + 0.45, 'bark', { dur: 0.36, gain: 0.7 });
   return { shots: S, cues: CUES };
 }

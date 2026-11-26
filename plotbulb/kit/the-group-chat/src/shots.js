@@ -1,6 +1,7 @@
 // THE GROUP CHAT: Dave insults Bev's lasagna in the family group chat; Linda "fixes" it.
 import { ctx, W, H, clamp, lerp, seg, eo, eio, eob } from './core/lib.js';
 import { L, Le, Wd, T } from './core/timing.js';
+import { pettysCard } from './pb2.js';
 import { CAST, P, INK, person, head, livingRoom, bigWindow, endCard, blurred, tint, stroke, disc, label, box, poly } from './pb.js';
 
 const ENV = await (await fetch('data/env.json', { cache: 'no-store' })).json();
@@ -159,7 +160,7 @@ export function buildShots() {
   } });
   cue(C.react - 0.02, 'whoosh');
 
-  add({ id: 'J', at: C.end, cam: [540, 960], zoom: 0, note: 'Follow Plotbulb', draw(lt) { endCard(lt); } });
-  cue(C.end + 0.05, 'pop'); cue(C.end + 0.2, 'sparkle', { gain: 0.6 });
+  add({ id: 'J', at: C.end, cam: [540, 960], zoom: 0, note: 'The Pettys card', draw(lt, d, t) { pettysCard(lt, t); } });
+  cue(C.end, 'sting'); cue(C.end + 0.05, 'pop', { gain: 0.4 }); cue(C.end + 0.12, 'pop', { gain: 0.4 }); cue(C.end + 0.19, 'pop', { gain: 0.4 }); cue(C.end + 0.45, 'bark', { dur: 0.36, gain: 0.7 });
   return { shots: S, cues: CUES };
 }
