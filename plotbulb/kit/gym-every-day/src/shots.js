@@ -28,14 +28,16 @@ function phone(x, y, s = 1) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); 
 function yard(t, o = {}) {
   street({ pettyHedge: { h: 140 }, garyHedge: { h: 330 } });
   // Linda on the porch, by the door
-  person(272, 1235, CAST.linda, { s: 0.5, mood: o.lindaMood || 'flat', talk: o.lindaTalk ? talk('linda', t) : 0, blink: blink(t, 0.6), look: [-0.3, 0.4] });
+  person(272, 1235, CAST.linda, { s: 0.56, t, gesture: 'cross', mood: o.lindaMood || 'flat', blink: blink(t, 0.6), look: [0.5, 0.4] });
   gymBag(250, GROUND + 10, 0.85);
-  const gx = lerp(1250, 900, eo(clamp(t / 2.4))), px = lerp(1150, 690, eo(clamp(t / 2.4)));
-  stroke([[gx - 60, GROUND - 360], [px + 100, GROUND - 120]], '#C0392B', 5);   // leash
+  const k = clamp(t / 2.4), gx = 1250 - 340 * k, px = 1150 - 470 * k, gs = 0.74;   // Gary walks in at constant speed, then stops
+  stroke([[gx - 250 * gs, GROUND - 480 * gs], [px + 100, GROUND - 110]], '#C0392B', 5);   // leash
   pickles(px, GROUND + 25, 0.62, { dir: -1, t, bark: o.bark || 0 });
-  person(gx, GROUND, CAST.gary, { s: 0.66, mood: 'smug', look: [-1, 0], blink: blink(t, 1.4), walk: t < 2.4 ? t * 9 : 0, arms: { L: 0.35 } });
-  person(470, GROUND, CAST.dave, { s: 0.66, mood: o.daveMood || 'happy', talk: talk('dave', t), band: BAND, blink: blink(t, 0.2),
-    arms: { R: 0.4, bR: 2.2, L: -0.1 }, hold: (hx, hy) => shake(hx + 4, hy + 30, 0.8) });
+  person(gx, GROUND, CAST.gary, { s: gs, t, mood: 'smug', look: [-1, 0], blink: blink(t, 1.4), walk: k < 1 ? t * 7.5 : 0,
+    hands: k < 1 ? { L: [-250, -480], R: [150 + Math.cos(t * 7.5) * 30, -330] } : { L: [-250, -480], R: [128, -392] } });
+  const brag = talk('dave', t);
+  person(470, GROUND, CAST.dave, { s: 0.74, t, mood: o.daveMood || 'happy', talk: brag, band: BAND, blink: blink(t, 0.2),
+    squash: brag > 0.6 ? 0.18 : 0, gesture: 'flex', hold: (hx, hy) => shake(hx, hy + 40, 0.8) });
 }
 function pickClose(lt, t, fury) {   // Pickles barking, close
   blurred(12, () => { ctx.save(); ctx.translate(-300, -700); ctx.scale(1.6, 1.6); street({ noMailbox: true }); ctx.restore(); }, 'streetBlur');
@@ -67,7 +69,7 @@ export function buildShots() {
   // 3. "...Most days."
   add({ id: 'C', at: C.c, cam: [540, 1000], zoom: 0.07, note: 'Dave: most days', draw(lt, d, t) {
     blurred(12, () => { ctx.save(); ctx.translate(-300, -700); ctx.scale(1.6, 1.6); street({ noMailbox: true }); ctx.restore(); }, 'streetBlur');
-    person(540, 2460, CAST.dave, { s: 1.35, mood: 'annoyed', talk: talk('dave', t), band: BAND, sweat: 1, look: [0.8, 0.4], arms: { R: 0.3, bR: 2.3 }, hold: (hx, hy) => shake(hx + 6, hy + 50, 1.5) });
+    person(540, 2264, CAST.dave, { s: 1.45, t, mood: 'annoyed', talk: talk('dave', t), band: BAND, sweat: 1, look: [0.8, 0.4], gesture: 'scratch', tilt: -0.08 });
   } });
   cue(C.c - 0.02, 'whoosh', { gain: 0.6 });
 
@@ -80,7 +82,7 @@ export function buildShots() {
   // 5. The truth: "...I drove past it." Pickles is satisfied.
   add({ id: 'E', at: C.e, cam: [540, 1000], zoom: 0.07, note: 'Dave: I drove past it', draw(lt, d, t) {
     blurred(12, () => { ctx.save(); ctx.translate(-300, -700); ctx.scale(1.6, 1.6); street({ noMailbox: true }); ctx.restore(); }, 'streetBlur');
-    person(500, 2460, CAST.dave, { s: 1.35, mood: 'cry', talk: talk('dave', t), band: BAND, sweat: 1, t, arms: { R: 0.15, L: 0.15 } });
+    person(500, 2264, CAST.dave, { s: 1.45, t, mood: 'cry', talk: talk('dave', t), band: BAND, sweat: 1, slump: eo(seg(lt, 0, 0.5)), gesture: 'hang' });
     const pin = eob(seg(t, Le(2) + 0.05, Le(2) + 0.3));
     if (pin > 0) { pickles(lerp(1300, 900, pin), 1980, 1.2, { dir: -1, t: t * 4, bark: 0 }); label('✓', 980, 1560, 120 * pin, '#2BB673', 18); }
   } });
@@ -90,15 +92,16 @@ export function buildShots() {
   add({ id: 'F', at: C.f, cam: [540, 1000], zoom: 0.06, note: 'Linda: the gym called', draw(lt, d, t) {
     blurred(12, () => { ctx.save(); ctx.translate(-80, -500); ctx.scale(1.7, 1.7); street({ noMailbox: true }); ctx.restore(); }, 'porchBlur');
     const final = t > L(4) - 0.1;
-    person(540, 2500, CAST.linda, { s: 1.4, mood: final ? 'flat' : 'happy', talk: talk('linda', t), blink: final ? 0 : blink(t, 0.4),
-      arms: { R: 0.35, bR: 2.4 }, hold: (hx, hy) => phone(hx, hy - 40, 1.6) });
+    person(540, 2264, CAST.linda, { s: 1.45, t, mood: final ? 'flat' : 'happy', talk: talk('linda', t), blink: final ? 0 : blink(t, 0.4),
+      gesture: final ? 'cross' : 'phoneShow', lean: final ? 0.03 : 0, hold: final ? null : (hx, hy) => phone(hx + 10, hy - 60, 2.0) });
   } });
   cue(C.f - 0.02, 'whoosh', { gain: 0.6 }); cue(L(4) + 1.3, 'thud', { gain: 0.6 });
 
   // 7. Dave's face; one last bark
   add({ id: 'G', at: C.h, cam: [540, 1000], zoom: 0.1, note: 'Dave reaction', draw(lt, d, t) {
     blurred(12, () => { ctx.save(); ctx.translate(-300, -700); ctx.scale(1.6, 1.6); street({ noMailbox: true }); ctx.restore(); }, 'streetBlur');
-    person(540, 2460, CAST.dave, { s: 1.4, mood: 'shock', band: BAND, sweat: 1, t, arms: { L: 0.15, R: 0.15 } });
+    const q = lt < 0.1 ? lt / 0.1 * 0.5 : Math.max(-0.35, 0.5 - (lt - 0.1) * 8) * Math.exp(-(lt - 0.1) * 3);
+    person(540, 2264, CAST.dave, { s: 1.45, t, mood: 'shock', band: BAND, sweat: 1, squash: q, gesture: 'shock' });
     label('!', 190, 380, 170, P.red, 18); label('!', 880, 340, 170, P.red, 18);
     const pin = eob(seg(t, bark3 - 0.25, bark3));
     if (pin > 0) { pickles(lerp(1300, 900, pin), 1990, 1.2, { dir: -1, t, bark: t > bark3 && t < bark3 + 0.35 ? 1 : 0.2 }); yap(760, 1180, seg(t, bark3, bark3 + 0.12), -0.15); }

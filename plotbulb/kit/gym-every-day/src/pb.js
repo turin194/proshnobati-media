@@ -182,68 +182,120 @@ export function head(x, y, r, o = {}) {
   }
 }
 
-// ---------- full figure ----------
-// x = centre, y = ground (feet). s = scale (1 → about 1180 px tall). arms: { L: angle, R: angle } in radians from straight down
-// (positive = outwards/forwards), elbowL / elbowR bend. hold: (handX, handY) => draw a prop in the right hand.
-export function person(x, y, c, o = {}) {
-  const s = o.s ?? 1, lw = 9 * s;
-  const hipY = o.sit ? o.seatY - 20 * s : y - 480 * s, tw = 225 * s, th = 430 * s, topY = hipY - th + 10 * s, r = 160 * s;
-  const bob = o.bob || 0;
-  ctx.save(); ctx.translate(0, bob);
-  // legs
-  if (c.skirt) {
-    for (const side of [-1, 1]) {
-      stroke([[x + side * 40 * s, hipY + 100 * s], [x + side * 44 * s, y - 14 * s]], INK, 12 * s);
-      oval(x + side * 52 * s, y - 10 * s, 26 * s, 12 * s, c.shoes, INK, 5 * s);
-    }
-    poly([[x - tw * 0.46, hipY - 50 * s], [x + tw * 0.46, hipY - 50 * s], [x + tw * 0.68, hipY + 170 * s], [x - tw * 0.68, hipY + 170 * s]], c.skirt, INK, lw);
-  } else if (o.sit) {
-    // seated: thighs forward (to dir), shins down
-    const d = o.dir || 1, kneeX = x + d * 190 * s, seatY = hipY + 20 * s;
-    for (const k of [0, 1]) {
-      const off = k * 18 * s;
-      stroke([[x, seatY - off], [kneeX + off * d, seatY - off]], c.pants === '#1E1E22' ? INK : c.pants, 66 * s);
-      stroke([[kneeX + off * d, seatY - off], [kneeX + off * d + d * 10 * s, y - 20 * s]], c.pants, 60 * s);
-      oval(kneeX + off * d + d * 34 * s, y - 14 * s, 42 * s, 18 * s, INK, null);
-    }
-  } else {
-    const wk = o.walk ? Math.sin(o.walk) * 18 * s : 0;
-    for (const side of [-1, 1]) {
-      const lx = x + side * 52 * s;
-      if (c.pants === '#1E1E22') box(lx - 34 * s, hipY - 20 * s, 68 * s, y - hipY + 6 * s + side * wk * 0, 26 * s, INK, INK, 2);
-      else { box(lx - 34 * s, hipY - 20 * s, 68 * s, (y - hipY) * 0.62, 18 * s, c.pants, INK, lw); stroke([[lx, hipY + (y - hipY) * 0.55], [lx + side * wk, y - 16 * s]], INK, 14 * s); }
-      oval(lx + side * 12 * s + side * wk, y - 12 * s, 40 * s, 17 * s, INK, null);
+// ---------- full figure (v2 rig: chunkier proportions, 2-bone IK arms, idle life, talk gestures, walk) ----------
+// x = centre, y = ground (feet). s = scale (1 → about 1030 px tall). t = film time (idle motion needs it).
+// Hands: o.hands = { L: [lx, ly], R: [lx, ly] } targets in LOCAL units (origin at feet, +x = character's right on screen),
+//        or o.gesture: 'rest' 'hips' 'cross' 'point' 'phoneEar' 'phoneShow' 'cheeks' 'scratch' 'flex' 'shrug' 'beg' 'hang' 'hold'
+// o.talk 0..1 (mouth + head bob + beat gestures), o.squash (-1 stretch .. 1 squash), o.lean (rad), o.slump 0..1,
+// o.walk = leg phase (radians, keeps increasing), o.sit = true (front-view seated, feet at y), hold / holdL (hx, hy) => prop
+export const SH = -680, HIP = -360;
+export function ik(S, P, a, b, bend) {
+  let dx = P[0] - S[0], dy = P[1] - S[1], d = Math.hypot(dx, dy); const m = a + b - 0.5;
+  if (d > m) { dx *= m / d; dy *= m / d; d = m; }
+  const ang = Math.atan2(dy, dx), A = Math.acos(clamp((a * a + d * d - b * b) / (2 * a * d), -1, 1)) * bend;
+  return { E: [S[0] + Math.cos(ang + A) * a, S[1] + Math.sin(ang + A) * a], H: [S[0] + dx, S[1] + dy] };
+}
+export function gestureHands(g, t = 0, talk = 0) {
+  const sw = Math.sin(t * 1.7) * 6;
+  switch (g) {
+    case 'hips': return { L: [-128, -392], R: [128, -392] };
+    case 'cross': return { L: [78, -548], R: [-78, -522], down: true };
+    case 'point': return { L: [-150 + sw, -330], R: [340, -650] };
+    case 'phoneEar': return { L: [-150, -330], R: [150, -835], down: true };
+    case 'phoneShow': return { L: [-150, -330], R: [235, -800], down: true };
+    case 'shock': { const b = Math.sin(t * 30) * 8; return { L: [-262, -935 + b], R: [262, -935 - b] }; }
+    case 'cheeks': return { L: [-150, -790], R: [150, -790], down: true };
+    case 'scratch': return { L: [-150, -330 + sw], R: [120 + Math.sin(t * 14) * 14, -990], down: true };
+    case 'flex': return { L: [-128, -392], R: [215, -900] };
+    case 'shrug': return { L: [-270, -620], R: [270, -620] };
+    case 'beg': return { L: [-34, -600 + Math.sin(t * 8) * 10], R: [34, -600 + Math.sin(t * 8) * 10], down: true };
+    case 'hang': return { L: [-120, -290], R: [120, -290] };
+    default: { // rest, with idle sway and talk beats on the right hand
+      const beat = talk > 0.05 ? (Math.sin(t * 7) * 30 + 40) * clamp(talk * 2) : 0;
+      return { L: [-150 + sw, -330], R: [150 + beat * 0.8 - sw, -330 - beat * 2.4] };
     }
   }
-  // torso
-  box(x - tw / 2, topY, tw, th, 22 * s, c.shirt, INK, lw);
-  if (c.badge) box(x - tw * 0.32, topY + th * 0.22, 34 * s, 13 * s, 2, c.badge, null);
-  if (c.collar) { stroke([[x - 30 * s, topY + 6 * s], [x - 8 * s, topY + 44 * s], [x + 2 * s, topY + 10 * s]], INK, 6 * s); stroke([[x + 30 * s, topY + 6 * s], [x + 10 * s, topY + 44 * s]], INK, 6 * s); }
-  if (o.torsoDraw) o.torsoDraw(x, topY, tw, th);
-  // arms (sleeve then forearm stick then hand)
-  const arm = (side, ang, bend, hold) => {
-    const sx = x + side * (tw / 2 - 12 * s), sy = topY + 40 * s;
-    const a = ang * side, ex = sx + Math.sin(a) * 210 * s, ey = sy + Math.cos(a) * 210 * s;
-    const a2 = a + bend * side, hx = ex + Math.sin(a2) * 160 * s, hy = ey + Math.cos(a2) * 160 * s;
-    stroke([[ex, ey], [hx, hy]], INK, 13 * s);
-    ctx.save(); ctx.translate(sx, sy); ctx.rotate(-a); box(-30 * s, -16 * s, 60 * s, 240 * s, 26 * s, c.shirt, INK, lw); ctx.restore();
-    if (hold) hold(hx, hy);
-    disc(hx, hy, 24 * s, INK, null);
-    return [hx, hy];
+}
+export function person(x, y, c, o = {}) {
+  const s = o.s ?? 1, t = o.t ?? 0, talk = clamp(o.talk || 0), seed = (x * 0.013) % 6.28;
+  const breathe = Math.sin(t * 2.3 + seed), slump = o.slump || 0, q = o.squash || 0;
+  const wph = o.walk || 0, walking = o.walk != null && o.walk !== 0;
+  const OUT = ctx.getTransform();
+  ctx.save();
+  ctx.translate(x, y + (o.bob || 0));
+  ctx.rotate((o.lean || 0) + (walking ? Math.sin(wph) * 0.025 : 0));
+  ctx.scale(s * (1 + 0.14 * q), s * (1 - 0.14 * q));
+  if (walking) ctx.translate(0, -Math.abs(Math.sin(wph)) * 14);
+  // soft ground shadow
+  if (!o.sit) { ctx.save(); ctx.globalAlpha = 0.16; ctx.beginPath(); ctx.ellipse(0, 4, 150, 22, 0, 0, TAU); ctx.fillStyle = '#000'; ctx.fill(); ctx.restore(); }
+  const sway = walking ? 0 : Math.sin(t * 0.9 + seed) * 5;            // idle weight shift
+  const up = -breathe * 4 + slump * 36;                               // chest rise / slump drop
+  const hip = o.sit ? -200 : HIP, top = (o.sit ? -560 : -728) + up, tw = 250, sh = top + 48;
+  // ---- legs ----
+  const darkPants = c.pants === '#1E1E22';
+  if (o.sit) {
+    for (const sd of [-1, 1]) {
+      stroke([[sd * 56, hip + 20], [sd * 66, -150]], c.skirt ? INK : (darkPants ? INK : c.pants), c.skirt ? 16 : 78);
+      stroke([[sd * 66, -150], [sd * 70, -18]], c.skirt ? INK : (darkPants ? INK : c.pants), c.skirt ? 16 : 70);
+      oval(sd * 80, -12, 46, 19, c.shoes || INK, INK, 6);
+    }
+    if (c.skirt) poly([[-tw * 0.5, hip - 30], [tw * 0.5, hip - 30], [tw * 0.62, hip + 70], [-tw * 0.62, hip + 70]], c.skirt, INK, 9);
+  } else {
+    for (const sd of [-1, 1]) {
+      const a = wph + (sd > 0 ? Math.PI : 0), lift = walking ? Math.max(0, Math.sin(a)) * 46 : 0, sw2 = walking ? Math.cos(a) * 22 : 0;
+      const hx = sd * 56 + sway, fx = sd * 62 + sw2, fy = -lift, kx = (hx + fx) / 2 + sd * 6, ky = (hip + fy) / 2 - lift * 0.4;
+      if (c.skirt) { stroke([[hx * 0.8, hip + 120], [kx, ky + 40], [fx, fy - 12]], INK, 14); oval(fx + sd * 10, fy - 9, 30, 13, c.shoes, INK, 5); }
+      else {
+        const col = darkPants ? INK : c.pants;
+        stroke([[hx, hip], [kx, ky], [fx, fy - 30]], INK, 86); stroke([[hx, hip], [kx, ky], [fx, fy - 30]], col, 72);
+        oval(fx + sd * 16, fy - 12, 48, 20, INK, null);
+      }
+    }
+    if (c.skirt) poly([[-tw * 0.47 + sway, hip - 46], [tw * 0.47 + sway, hip - 46], [tw * 0.66, hip + 150], [-tw * 0.66, hip + 150]], c.skirt, INK, 9);
+  }
+  // ---- torso (breathes) ----
+  ctx.save(); ctx.translate(sway, hip); ctx.scale(1, 1 + breathe * 0.012); ctx.translate(-sway, -hip);
+  box(-tw / 2 + sway, top, tw, hip - top + (c.skirt ? -20 : 14), 30, c.shirt, INK, 9);
+  box(-tw / 2 + 14 + sway, hip - 46 + (c.skirt ? -20 : 14), tw - 28, 18, 6, c.shirtDark, null);
+  if (c.badge) box(-tw * 0.3 + sway, top + 78, 36, 14, 2, c.badge, null);
+  if (c.collar) { stroke([[-30 + sway, top + 6], [-6 + sway, top + 48], [4 + sway, top + 12]], INK, 6); stroke([[30 + sway, top + 6], [10 + sway, top + 48]], INK, 6); }
+  ctx.restore();
+  // ---- head (bobs with speech, tilts) ----
+  const r = 176, hb = -talk * 16 + Math.sin(t * 2.3 + seed) * 2, hy = top - r + 46 + hb + slump * 20;
+  const tilt = (o.tilt || 0) + Math.sin(t * 1.3 + seed) * 0.035 + talk * 0.07 * Math.sin(t * 9) - slump * 0.05;
+  // ---- arms (IK, drawn after the head when hands come up in front of the face) ----
+  const H = o.hands || gestureHands(o.gesture || 'rest', t, talk);
+  const arm = (sd, P, hold) => {
+    const S = [sd * (tw / 2 - 22) + sway, sh + slump * 10];
+    const c1 = ik(S, P, 178, 170, 1), c2 = ik(S, P, 178, 170, -1);
+    const k = H.down ? (c1.E[1] > c2.E[1] ? c1 : c2) : (Math.abs(c1.E[0]) > Math.abs(c2.E[0])) !== !!o.elbowIn ? c1 : c2;   // elbows out (or down for hand-to-face poses)
+    stroke([k.E, k.H], INK, 17);
+    stroke([S, k.E], INK, 70); stroke([S, k.E], c.shirt, 56);
+    return k.H;
   };
-  const A = o.arms || {};
-  arm(-1, A.L ?? 0.08, A.bL ?? 0, o.holdL);
-  arm(1, A.R ?? 0.08, A.bR ?? 0, o.hold);
-  // head
-  head(x + (o.headDX || 0) * s, topY - r + 30 * s, r, { band: o.band, cast: c, mood: o.mood, talk: o.talk, look: o.look, blink: o.blink, sweat: o.sweat, shades: o.shades, t: o.t });
-  if (o.glow) { /* night readability: soft rim */ }
+  const handsUp = Math.min(H.L[1], H.R[1]) < top - 60;
+  const drawArms = () => {
+    const hl = arm(-1, H.L), hr = arm(1, H.R);
+    for (const [p, hold] of [[hl, o.holdL], [hr, o.hold]]) {
+      if (hold) {   // draw the prop in the caller's space, at the hand
+        const w = ctx.getTransform().transformPoint(new DOMPoint(p[0], p[1])), l = OUT.inverse().transformPoint(w);
+        ctx.save(); ctx.setTransform(OUT); hold(l.x, l.y); ctx.restore();
+      }
+      disc(p[0], p[1], 27, INK, null);
+    }
+  };
+  if (!handsUp) drawArms();
+  ctx.save(); ctx.translate(sway, hy); ctx.rotate(tilt);
+  head(0, 0, r, { band: o.band, cast: c, mood: o.mood, talk, look: o.look, blink: o.blink, sweat: o.sweat, shades: o.shades, t });
+  ctx.restore();
+  if (handsUp) drawArms();
   ctx.restore();
 }
 
 // ---------- Pickles the chihuahua ----------
 export function pickles(x, y, s = 1, o = {}) {
   const d = o.dir || 1, bark = o.bark || 0, lw = 7, fur = '#E2B97E';
-  ctx.save(); ctx.translate(x, y); ctx.scale(d * s, s);
+  ctx.save(); ctx.translate(x, y - (bark > 0.5 ? 14 * s : 0)); ctx.scale(d * s, s);
   for (const lx of [-60, -35, 40, 62]) stroke([[lx, -70], [lx, -8]], INK, 9);
   ctx.beginPath(); ctx.moveTo(-85, -95); ctx.quadraticCurveTo(-130, -150 - 20 * Math.sin((o.t || 0) * 20), -110, -170); ctx.strokeStyle = INK; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();
   oval(0, -100, 95, 48, fur, INK, lw);
