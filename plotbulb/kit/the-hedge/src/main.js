@@ -32,7 +32,7 @@ function draw(t) {
 
 (async () => {
   try {
-    await document.fonts.load('900 100px Inter');
+    await document.fonts.load('900 100px Inter'); await document.fonts.load('800 40px Inter'); await document.fonts.load('40px "Noto Color Emoji"');
     const script = await (await fetch('script.json', { cache: 'no-store' })).json();
     await loadTiming();
     buildCaptions(script);

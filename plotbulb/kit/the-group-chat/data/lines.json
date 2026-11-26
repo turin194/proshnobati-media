@@ -1,0 +1,49 @@
+{
+ "duration": 21.5,
+ "voice": "elevenlabs",
+ "speed": 1,
+ "lines": [
+  {
+   "i": 0,
+   "text": "Your mom's lasagna tastes like wet cardboard...",
+   "start": 0.4,
+   "end": 2.9
+  },
+  {
+   "i": 1,
+   "text": "send.",
+   "start": 3.85,
+   "end": 4.12
+  },
+  {
+   "i": 2,
+   "text": "No, no, no, no! The FAMILY group chat?!",
+   "start": 5.25,
+   "end": 7.25
+  },
+  {
+   "i": 3,
+   "text": "Dave.",
+   "start": 7.65,
+   "end": 8.25
+  },
+  {
+   "i": 4,
+   "text": "Mom read it.",
+   "start": 8.62,
+   "end": 9.25
+  },
+  {
+   "i": 5,
+   "text": "Linda, can you fix this?!",
+   "start": 9.5,
+   "end": 10.95
+  },
+  {
+   "i": 6,
+   "text": "Already fixed. I told her it was a joke... and that you begged her to stay with us for a month.",
+   "start": 11.3,
+   "end": 17.35
+  }
+ ]
+}

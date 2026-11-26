@@ -1,0 +1,35 @@
+{
+ "title": "The Group Chat",
+ "music": "bed",
+ "sources": [],
+ "lines": [
+  {
+   "text": "Your mom's lasagna tastes like wet cardboard...",
+   "caps": "YOUR MOM'S *LASAGNA | TASTES LIKE | WET *CARDBOARD..."
+  },
+  {
+   "text": "send.",
+   "caps": "*SEND."
+  },
+  {
+   "text": "No, no, no, no! The FAMILY group chat?!",
+   "caps": "NO, NO, *NO, NO! | THE *FAMILY | GROUP *CHAT?!"
+  },
+  {
+   "text": "Dave.",
+   "caps": "*DAVE."
+  },
+  {
+   "text": "Mom read it.",
+   "caps": "MOM *READ IT."
+  },
+  {
+   "text": "Linda, can you fix this?!",
+   "caps": "LINDA, CAN YOU | *FIX THIS?!"
+  },
+  {
+   "text": "Already fixed. I told her it was a joke... and that you begged her to stay with us for a month.",
+   "caps": "ALREADY *FIXED. | I TOLD HER | IT WAS A *JOKE... | AND THAT YOU *BEGGED HER | TO *STAY WITH US | FOR A *MONTH."
+  }
+ ]
+}
