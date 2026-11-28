@@ -545,7 +545,7 @@ export function pettysCard(lt, t, o = {}) {
   // the house behind the family
   const hk = eob(clamp(lt / 0.3));
   ctx.save(); ctx.translate(540, 1300); ctx.scale(hk, hk); ctx.translate(-540, -1300);
-  house(250, 1300, 580, {});
+  house(250, 1300, 580, { siding: '#8C9DB0', sidingLine: '#7E8FA3', roof: '#5E5A5A' });   // the blue Petty house
   ctx.restore();
   // family pops in, one by one (squash on landing)
   const pop = (a) => { const k = clamp((lt - a) / 0.22); return k <= 0 ? null : { k: eob(k), q: k < 1 ? 0.35 * (1 - k) : 0 }; };

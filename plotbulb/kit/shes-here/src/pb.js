@@ -242,16 +242,11 @@ export function person(x, y, c, o = {}) {
   if (!o.sit) { ctx.save(); ctx.globalAlpha = 0.16; ctx.beginPath(); ctx.ellipse(0, 4, 150, 22, 0, 0, TAU); ctx.fillStyle = '#000'; ctx.fill(); ctx.restore(); }
   const sway = walking ? 0 : Math.sin(t * 0.9 + seed) * 5;            // idle weight shift
   const up = -breathe * 4 + slump * 36;                               // chest rise / slump drop
-  const hip = o.sit ? -200 : HIP, top = (o.sit ? -560 : -728) + up, tw = 250, sh = top + 48;
+  const hip = HIP, top = -728 + up, tw = 250, sh = top + 48;
   // ---- legs ----
   const darkPants = c.pants === '#1E1E22';
   if (o.sit) {
-    for (const sd of [-1, 1]) {
-      stroke([[sd * 56, hip + 20], [sd * 66, -150]], c.skirt ? INK : (darkPants ? INK : c.pants), c.skirt ? 16 : 78);
-      stroke([[sd * 66, -150], [sd * 70, -18]], c.skirt ? INK : (darkPants ? INK : c.pants), c.skirt ? 16 : 70);
-      oval(sd * 80, -12, 46, 19, c.shoes || INK, INK, 6);
-    }
-    if (c.skirt) poly([[-tw * 0.5, hip - 30], [tw * 0.5, hip - 30], [tw * 0.62, hip + 70], [-tw * 0.62, hip + 70]], c.skirt, INK, 9);
+    if (c.skirt) poly([[-tw * 0.47, hip - 46], [tw * 0.47, hip - 46], [tw * 0.52, hip + 40], [-tw * 0.52, hip + 40]], c.skirt, INK, 9);
   } else {
     for (const sd of [-1, 1]) {
       const a = wph + (sd > 0 ? Math.PI : 0), lift = walking ? Math.max(0, Math.sin(a)) * 46 : 0, sw2 = walking ? Math.cos(a) * 22 : 0;
@@ -550,7 +545,7 @@ export function pettysCard(lt, t, o = {}) {
   // the house behind the family
   const hk = eob(clamp(lt / 0.3));
   ctx.save(); ctx.translate(540, 1300); ctx.scale(hk, hk); ctx.translate(-540, -1300);
-  house(250, 1300, 580, {});
+  house(250, 1300, 580, { siding: '#8C9DB0', sidingLine: '#7E8FA3', roof: '#5E5A5A' });   // the blue Petty house
   ctx.restore();
   // family pops in, one by one (squash on landing)
   const pop = (a) => { const k = clamp((lt - a) / 0.22); return k <= 0 ? null : { k: eob(k), q: k < 1 ? 0.35 * (1 - k) : 0 }; };
@@ -630,4 +625,34 @@ export function porch(o = {}) {
   ctx.fillStyle = '#B98A5E'; ctx.fillRect(-300, 1560, W + 600, 700); for (let y = 1600; y < 2300; y += 60) stroke([[-300, y], [W + 300, y]], '#A0744B', 4);
   stroke([[-300, 1560], [W + 300, 1560]], INK, 8);
   box(180, 1575, 320, 70, 10, '#7A9A4C', INK, 6); label('WELCOME', 340, 1611, 34, '#E9F2D6', 0, INK, 900);
+}
+
+
+// ---------- sitting ----------
+// Sitting = 3 layers: (1) sitter(...) upper body, (2) the seat front / armrests from the set image on top,
+// (3) sitLegs(...) knees over the cushion edge and shins down to the floor, in front of everything.
+export function sitter(x, seatY, c, o = {}) { person(x, seatY - HIP * (o.s ?? 1), c, { ...o, sit: true }); }
+export function sitLegs(x, seatY, kneeY, floorY, s, c, o = {}) {
+  const spread = o.spread ?? 70;
+  const col = c.pants === '#1E1E22' ? '#2B2B31' : c.pants, lap = c.pants === '#1E1E22' ? '#44444C' : c.pants;
+  for (const sd of [-1, 1]) {
+    const kx = x + sd * spread * s, fx = kx + sd * 8 * s;
+    if (c.skirt) {
+      stroke([[kx, kneeY], [fx, floorY - 16 * s]], INK, 15 * s);
+      oval(fx + sd * 8 * s, floorY - 12 * s, 36 * s, 16 * s, c.shoes, INK, 5 * s);
+      continue;
+    }
+    // shin (straight down from the knee), then the shoe pointing at the camera
+    box(kx - 36 * s, kneeY, 72 * s, floorY - kneeY - 22 * s, 18 * s, col, INK, 8 * s);
+    oval(fx + sd * 6 * s, floorY - 20 * s, 60 * s, 28 * s, INK, null);
+    // thigh seen from the front = a short, lighter, foreshortened shape coming toward us, ending in the knee
+    ctx.beginPath(); ctx.ellipse(x + sd * (spread - 12) * s, (seatY + kneeY) / 2 - 6 * s, 52 * s, (kneeY - seatY) / 2 + 40 * s, 0, 0, TAU);
+    ctx.fillStyle = lap; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 8 * s; ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(kx, kneeY + 4 * s, 50 * s, 34 * s, 0, 0, TAU); ctx.fillStyle = lap; ctx.fill(); ctx.stroke();   // knee cap
+    ctx.save(); ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.ellipse(kx - sd * 6 * s, kneeY - 6 * s, 26 * s, 12 * s, 0, 0, TAU); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.restore();
+    if (o.handsOnKnees !== false) disc(kx - sd * 4 * s, kneeY - 12 * s, 27 * s, INK, null);   // hand resting on the knee
+  }
+  if (c.skirt) {   // skirt drapes over the knees
+    poly([[x - 120 * s, seatY - 30 * s], [x + 120 * s, seatY - 30 * s], [x + (spread + 46) * s, kneeY + 26 * s], [x - (spread + 46) * s, kneeY + 26 * s]], c.skirt, INK, 8 * s);
+  }
 }
