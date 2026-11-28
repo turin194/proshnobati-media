@@ -13,3 +13,7 @@ Always pass `t`. Close-up: feet at y = 1020 + 858 * s puts the head centre at y 
 `pettysCard(lt, t)` in `pettys-card/src/pb.js` (also in gym-every-day) replaces `endCard`. Give it ~2.8 s at the end, with cues:
 `sting` at the card start (our own original brass fanfare in tools/mix.py, hit at +0.42 s), pops at +0.05/+0.12/+0.19, `bark` (dur 0.36) at +0.45.
 On the card: Dave, Linda, Gary, Pickles. Add Grandma Bev once she has debuted on screen.
+
+## User-made sets (`sets/`)
+Each set folder has the images plus SET.md with seat/standing measurements and overlays. `rig/pb.js` is the current kit
+(rig v2 + proper sitting: `sitter()`, seat-front rects from the image, `sitLegs()` with hands on knees).
