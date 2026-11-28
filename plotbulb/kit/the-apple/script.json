@@ -1,0 +1,30 @@
+{
+ "title": "The Apple",
+ "music": "bed",
+ "lines": [
+  {
+   "text": "Dave, use the cutting board.",
+   "caps": "DAVE, USE THE | CUTTING *BOARD."
+  },
+  {
+   "text": "ON the cutting board!",
+   "caps": "*ON THE | CUTTING BOARD!"
+  },
+  {
+   "text": "Like THIS.",
+   "caps": "LIKE *THIS."
+  },
+  {
+   "text": "Ow.",
+   "caps": "*OW."
+  },
+  {
+   "text": "Dave! Use your HEAD!",
+   "caps": "DAVE! | USE YOUR *HEAD!"
+  },
+  {
+   "text": "...It worked!",
+   "caps": "...IT *WORKED!"
+  }
+ ]
+}
