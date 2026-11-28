@@ -87,7 +87,7 @@ export function buildShots() {
   const S = [], CUES = [];
   const add = (s) => S.push(s), cue = (t, type, extra = {}) => CUES.push({ t: +t.toFixed(3), type, ...extra });
   const DX = 330, LXo = 840;                         // Dave / Linda x in the two-shot
-  const T1 = 1.7, sawA = 4.45, sawB = 5.7, T3 = Le(1) + 0.05, T4 = 9.55, chopL = 10.9, chopD = 12.55, CL = L(4) - 0.2, HB = Le(4) + 0.15, hit = HB + 0.5, C2 = L(5) - 0.15, CH = Le(5) + 0.2, C3 = CH + 2.2, CARD = 22.3;
+  const T1 = 1.7, sawA = 4.45, sawB = 5.7, T3 = Le(1) + 0.05, T4 = 9.55, chopL = 10.9, chopD = 12.55, CL = L(4) - 0.2, HB = Le(4) + 0.15, hit = HB + 0.5, C2 = L(5) - 0.15, CH = Le(5) + 0.2, C3 = CH + 2.2, CARD = 22.3, SAW0 = chopL + 1.4, SAWE = 12.95;
 
   // 1. Wide: Linda at the sink, Dave walks in with an apple
   add({ id: 'A', at: 0, cam: [540, 1150], zoom: 0.04, note: 'wide kitchen, Dave walks in', draw(lt, d, t) {
@@ -129,10 +129,10 @@ export function buildShots() {
       ap = [lerp(bx - 100, bx + 100, k), by - 80 - 54];
       dh = { L: loc(bx - 120, by - 20, DX), R: loc(ap[0] + 30, ap[1] + 10, DX) }; dmood = 'happy';
       boardDraw = () => board(bx, by, 1, 0);
-    } else if (t < chopD + 0.05) {                             // board flat with the apple on it; Dave watches, then copies the chop
-      const up = seg(t, chopD - 0.45, chopD - 0.1), dn = seg(t, chopD - 0.05, chopD + 0.05);
-      const hy = t > chopL + 0.9 ? lerp(lerp(-330, -820, eo(up)), -400, eio(dn)) : -330;
-      dh = { L: [-150, -330], R: [t > chopL + 0.9 ? lerp(150, 40, dn) : 150, hy] }; dmood = t > chopL + 0.9 ? 'angry' : 'calm';
+    } else if (t < SAWE) {                             // board flat with the apple on it; Dave watches, then copies the chop
+      const go = eio(seg(t, chopL + 0.9, SAW0)), saw = t > SAW0 ? Math.sin((t - SAW0) * 18) * 55 : 0;   // hand edge on the apple, sawing like a knife
+      const tg = loc(BX + saw, TOP - 125, DX);
+      dh = { L: [-150, -330], R: [lerp(150, tg[0], go), lerp(-330, tg[1], go)] }; dmood = t > chopL + 0.9 ? 'angry' : 'calm';
       ap = [BX, TOP - 18 - 56]; boardDraw = () => board(BX, TOP - 8, 1, 0, true);
     } else {                                                   // ow
       const sh = Math.sin(t * 30) * 30;
@@ -145,11 +145,11 @@ export function buildShots() {
     else if (boardDraw) { boardDraw(); apple(...ap, 1.35); }
     else apple(...ap, 1.35);
     if (t < sawA) knife; // knife is drawn in Dave's hand
-    if (t > chopD && t < chopD + 0.25) label('THUD!', DX + 170, TOP - 230, 80, P.yellow, 14);
+    
   } });
   cue(T1 - 0.02, 'whoosh', { gain: 0.5 }); cue(T1 + 0.4, 'tock', { gain: 0.6 });
   cue(sawA, 'slide', { dur: 1.3, gain: 0.8 }); cue(T3 + 0.2, 'slide', { dur: 1.6, gain: 0.5 });
-  cue(chopL, 'whoosh', { gain: 0.4 }); cue(chopD, 'thud', { gain: 0.9 });
+  cue(chopL, 'whoosh', { gain: 0.4 }); cue(SAW0, 'slide', { dur: SAWE - SAW0, gain: 0.6 });
 
   // 3. Linda: "Dave! Use your HEAD!"
   add({ id: 'C', at: CL, cam: [540, 980], zoom: 0.14, note: 'Linda furious close-up', draw(lt, d, t) {
